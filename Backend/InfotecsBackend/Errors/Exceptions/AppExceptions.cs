@@ -1,10 +1,10 @@
 ﻿namespace InfotecsBackend.Errors.Exceptions;
 
-public abstract class AppException : Exception
+public class AppException : Exception
 {
     public int StatusCode { get; }
     
-    protected AppException(string message, int statusCode) : base(message)
+    public AppException(string message, int statusCode) : base(message)
     {
         StatusCode = statusCode;
     }
@@ -26,4 +26,10 @@ public class ValidationException : AppException
 {
     public ValidationException(string message) 
         : base(message, 400) { }
+}
+
+public class DatabaseException : AppException
+{
+    public DatabaseException(string message) 
+        : base(message, 500) { }
 }

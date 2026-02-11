@@ -5,8 +5,6 @@ namespace InfotecsBackend.Models.DTO.Pagination;
 public class PageFilter
 {
 
-    public class PaginationFilter
-    {
         [Range(1, 1000)] 
         public int elementsLimit { get; set; } = 20;
         
@@ -14,5 +12,5 @@ public class PageFilter
         public int Offset { get; set; } = 0;
         
         public SortType SortDirection { get; set; } = SortType.Descending;
-    }
+    
 }
