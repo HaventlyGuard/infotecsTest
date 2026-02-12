@@ -65,15 +65,24 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<AppDbContext>();
-        await context.Database.MigrateAsync();
-        
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogInformation("Миграции успешно применены");
+        var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+        if (pendingMigrations.Any())
+        {
+            await context.Database.MigrateAsync();
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogInformation("Применено {Count} миграций", pendingMigrations.Count());
+        }
+        else
+        {
+            await context.Database.EnsureCreatedAsync();
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogInformation("База данных создана через EnsureCreated");
+        }
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Ошибка при выполнении миграций");
+        logger.LogError(ex, "Ошибка при инициализации базы данных");
     }
 }
 
