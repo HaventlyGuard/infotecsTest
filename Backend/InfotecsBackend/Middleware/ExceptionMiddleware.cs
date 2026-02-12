@@ -1,59 +1,43 @@
 ﻿using System.Net;
 using System.Text.Json;
 using InfotecsBackend.Errors.Exceptions;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace InfotecsBackend.Middleware;
 
-public class ExceptionMiddleware
+public class ExceptionMiddleware : IExceptionHandler
 {
-    private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionMiddleware> _logger;
 
-    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+    public ExceptionMiddleware(ILogger<ExceptionMiddleware> logger)
     {
-        _next = next;
         _logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext context)
-    {
-        try
-        {
-            await _next(context);
-        }
-        catch (Exception ex)
-        {
-            await HandleExceptionAsync(context, ex);
-        }
-    }
-
-    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken cancellationToken)
     {
         _logger.LogError(exception, "An error occurred");
 
         var response = context.Response;
         response.ContentType = "application/json";
 
-        var errorResponse = new
+        var (message, statusCode) = exception switch
         {
-            message = exception.Message,
-            statusCode = (int)HttpStatusCode.InternalServerError
+            AppException appEx => (appEx.Message, appEx.StatusCode),
+            _ => ("Internal server error", 500)
         };
 
-        switch (exception)
+        response.StatusCode = statusCode;
+
+        var errorResponse = new
         {
-            case AppException appEx:
-                errorResponse = new { message = appEx.Message, statusCode = appEx.StatusCode };
-                response.StatusCode = appEx.StatusCode;
-                break;
-                
-            default:
-                errorResponse = new { message = "Internal server error", statusCode = 500 };
-                response.StatusCode = 500;
-                break;
-        }
+            message,
+            statusCode
+        };
 
         var jsonResponse = JsonSerializer.Serialize(errorResponse);
-        await response.WriteAsync(jsonResponse);
+        await response.WriteAsync(jsonResponse, cancellationToken);
+        
+        return true;
     }
 }

@@ -181,7 +181,7 @@ public class SessionService : ISessionService
     }
     
     /// <summary>
-    /// Дополнительный метод для получения устройства по ID
+    /// Получение устройства по ID
     /// </summary>
     public async Task<DeviceResponse> GetDeviceByIdAsync(Guid deviceId, CancellationToken token)
     {
