@@ -30,4 +30,8 @@ public interface ISessionService
     /// Получение устройства по ID
     /// </summary>
     Task<DeviceResponse> GetDeviceByIdAsync(Guid deviceId, CancellationToken token);
+/// <summary>
+/// Создание нового девайса
+/// </summary>
+    Task<DeviceResponse> CreateDeviceAsync(CancellationToken token);
 }

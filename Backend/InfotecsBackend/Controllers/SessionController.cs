@@ -1,5 +1,6 @@
 ﻿using InfotecsBackend.Models.DTO.Pagination;
 using InfotecsBackend.Models.DTO.Session;
+using InfotecsBackend.Models.Mapping.Extentions;
 using InfotecsBackend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,10 +22,10 @@ public class SessionController(ISessionService sessionService) : ControllerBase
     /// <returns>Статус 204 No Content</returns>
     [HttpPost]
     public async Task<ActionResult> AddSession(
-        [FromBody] SessionResponse sessionInfo,
+        [FromBody] SessionCreate sessionInfo,
         CancellationToken token)
     {
-        await sessionService.HandleSessionAsync(sessionInfo, token);
+        await sessionService.HandleSessionAsync(sessionInfo.CreateToResponse(), token);
         
         return NoContent();
     }

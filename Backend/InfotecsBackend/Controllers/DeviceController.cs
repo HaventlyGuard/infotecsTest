@@ -44,4 +44,16 @@ public class DeviceController(ISessionService sessionService) : ControllerBase
         
         return Ok(device);
     }
+
+    /// <summary>
+    /// Создать устройство
+    /// </summary>
+    /// <param name="token">Токен отмены</param>
+    /// <returns>Созданное устройство</returns>
+    [HttpPost("create")]
+    public async Task<ActionResult<DeviceResponse>> CreateDeviceAsync(CancellationToken token)
+    {
+        var device = await sessionService.CreateDeviceAsync(token);
+        return Ok(device);
+    }
 }

@@ -14,6 +14,8 @@ public static class SessionExtensions
             StartTime = device.StartTime,
             EndTime = device.EndTime,
             DeviceId = device.DeviceId,
+            Version = device.Version,
+            Name = device.Name,
         };
     }
 
@@ -28,6 +30,22 @@ public static class SessionExtensions
             DeviceId = sessionResponse.DeviceId,
             CreatedAt = DateTime.UtcNow,
             Version = sessionResponse.Version,
+            Name = sessionResponse.Name,
+        };
+    }
+
+    public static SessionResponse CreateToResponse(this SessionCreate session)
+    {
+        return new SessionResponse()
+        {
+            DeviceId = session.DeviceId,
+            EndTime = session.EndTime,
+            IsDeleted = false,
+            Id = Guid.NewGuid(),
+            StartTime = session.StartTime,
+            Version = session.Version,
+            Name = session.Name,
+            
         };
     }
 }

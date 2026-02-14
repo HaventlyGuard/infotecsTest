@@ -203,4 +203,32 @@ public class SessionService : ISessionService
             throw new AppException($"Failed to get device {deviceId}", 500);
         }
     }
+    
+    /// <summary>
+    /// Создание нового девайса
+    /// </summary>
+    public async Task<DeviceResponse> CreateDeviceAsync(CancellationToken token)
+    {
+        try
+        {
+            _logger.LogInformation("Creating device");
+
+            var device = new Device(Guid.NewGuid())
+            {
+                CreatedAt = DateTime.UtcNow,
+                LastSeenAt = DateTime.UtcNow,
+            };
+            await _deviceRepository.AddDeviceAsync(device, token);
+            return device.DeviceToResponse();
+        }
+        catch (DeviceNotFoundException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding device");
+            throw new AppException("Failed to create device", 500);
+        }
+    }
 }
