@@ -1,0 +1,152 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>InfotecsBackend</name>
+    </assembly>
+    <members>
+        <member name="T:InfotecsBackend.Controllers.DeviceController">
+            <summary>
+            Контроллер для работы с устройствами
+            </summary>
+            <param name="sessionService">Сервис сессий</param>
+        </member>
+        <member name="M:InfotecsBackend.Controllers.DeviceController.#ctor(InfotecsBackend.Services.Interfaces.ISessionService)">
+            <summary>
+            Контроллер для работы с устройствами
+            </summary>
+            <param name="sessionService">Сервис сессий</param>
+        </member>
+        <member name="M:InfotecsBackend.Controllers.DeviceController.GetAllDevices(InfotecsBackend.Models.DTO.Pagination.PageFilter,System.Threading.CancellationToken)">
+            <summary>
+            Получить все устройства с пагинацией
+            </summary>
+            <param name="paginationFilter">Параметры пагинации</param>
+            <param name="token">Токен отмены</param>
+            <returns>Страница с устройствами</returns>
+        </member>
+        <member name="M:InfotecsBackend.Controllers.DeviceController.GetDeviceById(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Получить устройство по идентификатору
+            </summary>
+            <param name="deviceId">Идентификатор устройства</param>
+            <param name="token">Токен отмены</param>
+            <returns>Информация об устройстве</returns>
+        </member>
+        <member name="M:InfotecsBackend.Controllers.DeviceController.CreateDeviceAsync(System.Threading.CancellationToken)">
+            <summary>
+            Создать устройство
+            </summary>
+            <param name="token">Токен отмены</param>
+            <returns>Созданное устройство</returns>
+        </member>
+        <member name="T:InfotecsBackend.Controllers.SessionController">
+            <summary>
+            Контроллер для работы с сессиями
+            </summary>
+            <param name="sessionService">Сервис сессий</param>
+        </member>
+        <member name="M:InfotecsBackend.Controllers.SessionController.#ctor(InfotecsBackend.Services.Interfaces.ISessionService)">
+            <summary>
+            Контроллер для работы с сессиями
+            </summary>
+            <param name="sessionService">Сервис сессий</param>
+        </member>
+        <member name="M:InfotecsBackend.Controllers.SessionController.AddSession(InfotecsBackend.Models.DTO.Session.SessionCreate,System.Threading.CancellationToken)">
+            <summary>
+            Добавить информацию о сессии от стороннего приложения
+            </summary>
+            <param name="sessionInfo">Данные сессии</param>
+            <param name="token">Токен отмены</param>
+            <returns>Статус 204 No Content</returns>
+        </member>
+        <member name="M:InfotecsBackend.Controllers.SessionController.GetDeviceSessions(System.Guid,InfotecsBackend.Models.DTO.Pagination.PageFilter,System.Threading.CancellationToken)">
+            <summary>
+            Получить все сессии устройства по его идентификатору
+            </summary>
+            <param name="deviceId">Идентификатор устройства</param>
+            <param name="paginationFilter">Параметры пагинации</param>
+            <param name="token">Токен отмены</param>
+            <returns>Страница с сессиями устройства</returns>
+        </member>
+        <member name="M:InfotecsBackend.Controllers.SessionController.DeleteSessions(InfotecsBackend.Models.DTO.Session.SessionDelete,System.Threading.CancellationToken)">
+            <summary>
+            Мягкое удаление сессий по параметрам
+            </summary>
+            <param name="deleteParameters">Параметры удаления</param>
+            <param name="token">Токен отмены</param>
+            <returns>Статус 204 No Content</returns>
+        </member>
+        <member name="T:InfotecsBackend.Migrations.InitialCreate">
+            <inheritdoc />
+        </member>
+        <member name="M:InfotecsBackend.Migrations.InitialCreate.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:InfotecsBackend.Migrations.InitialCreate.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:InfotecsBackend.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:InfotecsBackend.Services.Interfaces.ISessionService.HandleSessionAsync(InfotecsBackend.Models.DTO.Session.SessionResponse,System.Threading.CancellationToken)">
+            <summary>
+            Обработка входящей сессии от стороннего приложения
+            </summary>
+        </member>
+        <member name="M:InfotecsBackend.Services.Interfaces.ISessionService.GetAllDevicesAsync(InfotecsBackend.Models.DTO.Pagination.PageFilter,System.Threading.CancellationToken)">
+            <summary>
+            Получение всех устройств с пагинацией
+            </summary>
+        </member>
+        <member name="M:InfotecsBackend.Services.Interfaces.ISessionService.GetDeviceSessionsAsync(System.Guid,InfotecsBackend.Models.DTO.Pagination.PageFilter,System.Threading.CancellationToken)">
+            <summary>
+            Получение сессий конкретного устройства с пагинацией
+            </summary>
+        </member>
+        <member name="M:InfotecsBackend.Services.Interfaces.ISessionService.DeleteSessionsAsync(InfotecsBackend.Models.DTO.Session.SessionDelete,System.Threading.CancellationToken)">
+            <summary>
+            Мягкое удаление сессий по параметрам
+            </summary>
+        </member>
+        <member name="M:InfotecsBackend.Services.Interfaces.ISessionService.GetDeviceByIdAsync(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Получение устройства по ID
+            </summary>
+        </member>
+        <member name="M:InfotecsBackend.Services.Interfaces.ISessionService.CreateDeviceAsync(System.Threading.CancellationToken)">
+            <summary>
+            Создание нового девайса
+            </summary>
+        </member>
+        <member name="M:InfotecsBackend.Services.SessionService.HandleSessionAsync(InfotecsBackend.Models.DTO.Session.SessionResponse,System.Threading.CancellationToken)">
+            <summary>
+            Обработка входящей сессии от стороннего приложения
+            </summary>
+        </member>
+        <member name="M:InfotecsBackend.Services.SessionService.GetAllDevicesAsync(InfotecsBackend.Models.DTO.Pagination.PageFilter,System.Threading.CancellationToken)">
+            <summary>
+            Получение списка всех устройств с пагинацией
+            </summary>
+        </member>
+        <member name="M:InfotecsBackend.Services.SessionService.GetDeviceSessionsAsync(System.Guid,InfotecsBackend.Models.DTO.Pagination.PageFilter,System.Threading.CancellationToken)">
+            <summary>
+            Получение сессий устройства с пагинацией
+            </summary>
+        </member>
+        <member name="M:InfotecsBackend.Services.SessionService.DeleteSessionsAsync(InfotecsBackend.Models.DTO.Session.SessionDelete,System.Threading.CancellationToken)">
+            <summary>
+            Мягкое удаление сессий по параметрам
+            </summary>
+        </member>
+        <member name="M:InfotecsBackend.Services.SessionService.GetDeviceByIdAsync(System.Guid,System.Threading.CancellationToken)">
+            <summary>
+            Получение устройства по ID
+            </summary>
+        </member>
+        <member name="M:InfotecsBackend.Services.SessionService.CreateDeviceAsync(System.Threading.CancellationToken)">
+            <summary>
+            Создание нового девайса
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,39 @@
+<div class="device-list-container">
+  <h1>Мониторинг устройств</h1>
+  <h2>Список устройств</h2>
+
+  @if (loading) {
+    <div class="loading">Загрузка устройств...</div>
+  }
+
+  @if (error) {
+    <div class="error">{{ error }}</div>
+  }
+
+  @if (!loading && !error) {
+    @if (devices.length === 0) {
+      <div class="empty">
+        <p>Нет зарегистрированных устройств</p>
+        <p class="hint">Добавьте устройство через API или Swagger</p>
+      </div>
+    } @else {
+      <div class="device-grid">
+        @for (device of devices; track device.deviceId) {
+          <div class="device-card">
+            <h3>{{ device.userName }}</h3>
+            <div class="device-info">
+              <p><strong>ID:</strong> {{ device.deviceId }}</p>
+              <p><strong>Последняя версия:</strong> {{ device.lastVersion }}</p>
+              <p><strong>Последняя активность:</strong> {{ device.lastSeen | date:'medium' }}</p>
+            </div>
+            <a [routerLink]="['/device', device.deviceId]" 
+               (click)="selectDevice(device.deviceId)"
+               class="btn-view">
+              Просмотреть сессии
+            </a>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

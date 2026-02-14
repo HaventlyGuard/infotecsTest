@@ -1,0 +1,21 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfotecsBackend", "InfotecsBackend.csproj", "{01586AD8-54DF-449D-AE77-087A5E340ADD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1169DDB2-7DC9-4786-8E76-C45340DC8CF4}"
+	ProjectSection(SolutionItems) = preProject
+		compose.yaml = compose.yaml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{01586AD8-54DF-449D-AE77-087A5E340ADD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01586AD8-54DF-449D-AE77-087A5E340ADD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01586AD8-54DF-449D-AE77-087A5E340ADD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01586AD8-54DF-449D-AE77-087A5E340ADD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
