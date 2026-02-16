@@ -8,13 +8,11 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
   standalone: true,
   imports: [CommonModule, RouterOutlet, DashboardComponent],
   template: `
-    <main>
-      <router-outlet></router-outlet>
-      <app-dashboard></app-dashboard>
-    </main>
+    <router-outlet></router-outlet>
   `,
   styles: [`
-    main {
+    :host {
+      display: block;
       min-height: 100vh;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }

@@ -1,7 +1,12 @@
 <div class="container">
   <header class="header">
     <h1>Панель мониторинга Infotecs</h1>
-    <div class="stats">Всего устройств: {{ totalDevices }}</div>
+    <div class="stats">
+      Всего устройств: <strong>{{ devices.length }}</strong>
+      @if (devices.length > 0) {
+        <span class="badge">Показано: {{ devices.length }}</span>
+      }
+    </div>
   </header>
 
   <div class="dashboard-layout">
@@ -12,19 +17,30 @@
           <button class="btn-icon" (click)="prevPage()" [disabled]="deviceFilter.offset === 0">
             <span>←</span>
           </button>
-          <span class="pagination-info">Стр. {{ (deviceFilter.offset / deviceFilter.limit) + 1 }}</span>
-          <button class="btn-icon" (click)="nextPage()">
+          <span class="pagination-info">
+            Стр. {{ getCurrentPage() }} из {{ getTotalPages() }}
+          </span>
+          <button class="btn-icon" (click)="nextPage()" 
+                  [disabled]="(deviceFilter.offset + deviceFilter.limit) >= totalDevices">
             <span>→</span>
           </button>
         </div>
       </div>
 
-      <app-device-list
-        [devices]="devices"
-        [selectedDeviceId]="selectedDeviceId"
-        (deviceSelected)="onDeviceSelected($event)"
-        (devicesUpdated)="onDevicesUpdated()">
-      </app-device-list>
+      @if (devices.length > 0) {
+        <app-device-list
+          [devices]="devices"
+          [selectedDeviceId]="selectedDeviceId"
+          (deviceSelected)="onDeviceSelected($event)"
+          (devicesUpdated)="onDevicesUpdated()">
+        </app-device-list>
+      } @else {
+        <div class="empty-state">
+          <div class="empty-icon">📱</div>
+          <h3>Устройства не найдены</h3>
+          <p>Проверьте подключение к серверу</p>
+        </div>
+      }
     </div>
 
     <div class="sessions-panel">
@@ -35,9 +51,9 @@
         </app-session-list>
       } @else {
         <div class="empty-state">
-          <div class="empty-icon">📱</div>
+          <div class="empty-icon">📊</div>
           <h3>Устройство не выбрано</h3>
-          <p>Выберите устройство из списка слева, чтобы просмотреть и управлять его сессиями</p>
+          <p>Выберите устройство из списка слева</p>
         </div>
       }
     </div>
