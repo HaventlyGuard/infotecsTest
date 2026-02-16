@@ -1,11 +1,11 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { DeviceInfo } from '../../models/device.models';
 
 @Component({
   selector: 'app-device-list',
   standalone: true,
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule],
   templateUrl: './device-list.component.html',
   styleUrls: ['./device-list.component.less']
 })
@@ -16,21 +16,26 @@ export class DeviceListComponent {
   @Output() devicesUpdated = new EventEmitter<void>();
 
   selectDevice(deviceId: string | undefined) {
+    console.log('Device selected in list:', deviceId);
     if (deviceId) {
       this.deviceSelected.emit(deviceId);
     }
   }
 
   formatDeviceId(id: string): string {
-  if (!id) return '';
-  return id.length > 12 ? id.substring(0, 12) + '...' : id;
-    }
+    if (!id) return '';
+    return id.length > 12 ? id.substring(0, 12) + '...' : id;
+  }
 
-isDeviceOnline(device: DeviceInfo): boolean {
-  if (!device.lastSeenAt) return false;
-  const lastSeen = new Date(device.lastSeenAt).getTime();
-  const now = Date.now();
-  const fiveMinutes = 5 * 60 * 1000;
-  return (now - lastSeen) < fiveMinutes;
-    }
+  isDeviceOnline(device: DeviceInfo): boolean {
+    if (!device.lastSeenAt) return false;
+    const lastSeen = new Date(device.lastSeenAt).getTime();
+    const now = Date.now();
+    const fiveMinutes = 5 * 60 * 1000;
+    return (now - lastSeen) < fiveMinutes;
+  }
+
+  trackByDeviceId(index: number, device: DeviceInfo): string {
+    return device.id || index.toString();
+  }
 }

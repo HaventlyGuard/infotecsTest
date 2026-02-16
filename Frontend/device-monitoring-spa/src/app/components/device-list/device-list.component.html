@@ -1,0 +1,30 @@
+
+
+<div class="device-list-container">
+  <div *ngIf="devices.length === 0" class="no-devices">
+    <p>Устройства не найдены</p>
+  </div>
+  
+  <div class="device-list">
+    <div *ngFor="let device of devices; trackBy: trackByDeviceId" 
+         class="device-card" 
+         [class.active]="device.id === selectedDeviceId"
+         (click)="selectDevice(device.id)">
+      <div class="device-status" [class.online]="isDeviceOnline(device)"></div>
+      <div class="device-info">
+        <div class="device-id">{{ formatDeviceId(device.id || '') }}</div>
+        <div class="device-meta">
+          <span class="meta-item">
+            <span class="meta-label">Создан:</span>
+            <span class="meta-value">{{ device.createdAt | date:'dd.MM HH:mm' }}</span>
+          </span>
+          <span class="meta-item">
+            <span class="meta-label">Последний:</span>
+            <span class="meta-value">{{ device.lastSeenAt | date:'dd.MM HH:mm' }}</span>
+          </span>
+        </div>
+      </div>
+      <div class="device-arrow">→</div>
+    </div>
+  </div>
+</div>

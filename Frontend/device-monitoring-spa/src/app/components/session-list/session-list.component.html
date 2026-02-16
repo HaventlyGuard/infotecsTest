@@ -1,107 +1,115 @@
 <div class="sessions-container">
   <div class="sessions-header">
-    <div class="title-section">
+    <div class="header-left">
       <h2>Сессии устройства</h2>
-      <span class="device-badge">{{ deviceId | slice:0:12 }}...</span>
+      <span class="device-id-badge">{{ deviceId | slice:0:8 }}...</span>
     </div>
-    <div class="header-actions">
+    <div class="header-right">
+      <button class="btn-refresh-small" (click)="refresh()" [disabled]="isLoading" title="Обновить">
+        <span class="refresh-icon" [class.spinning]="isLoading">↻</span>
+      </button>
       <div class="pagination">
-        <button class="btn-icon" (click)="prevPage()" [disabled]="filter.offset === 0">←</button>
-        <span class="page-info">Стр. {{ (filter.offset / filter.limit) + 1 }} из {{ totalSessions ? (totalSessions/filter.limit) : 1 }}</span>
-        <button class="btn-icon" (click)="nextPage()" [disabled]="(filter.offset + filter.limit) >= totalSessions">→</button>
+        <button class="btn-icon" (click)="prevPage()" [disabled]="filter.offset === 0 || isLoading">
+          <span>←</span>
+        </button>
+        <span class="page-info">
+          {{ getCurrentPage() }}/{{ getTotalPagesDisplay() }}
+        </span>
+        <button class="btn-icon" (click)="nextPage()" 
+                [disabled]="(filter.offset + filter.limit) >= totalSessions || isLoading">
+          <span>→</span>
+        </button>
       </div>
     </div>
   </div>
 
   <div class="sessions-toolbar">
     <div class="selection-info" [class.has-selection]="getSelectedCount() > 0">
-      <span>Выбрано: {{ getSelectedCount() }}</span>
+      <span *ngIf="getSelectedCount() === 0">Нет выбранных сессий</span>
+      <span *ngIf="getSelectedCount() > 0">Выбрано: {{ getSelectedCount() }}</span>
     </div>
     <div class="toolbar-actions">
-      <button class="btn btn-outline" (click)="openDeleteModal('date')">
-        <span>🗓️</span> Удалить по дате
+      <button class="btn btn-outline" (click)="openDeleteModal('date')" [disabled]="isLoading">
+        <span>📅</span> Удалить по дате
       </button>
-      <button class="btn btn-danger" (click)="openDeleteModal('selected')" [disabled]="getSelectedCount() === 0">
+      <button class="btn btn-danger" (click)="openDeleteModal('selected')" 
+              [disabled]="getSelectedCount() === 0 || isLoading">
         <span>🗑️</span> Удалить выбранное
       </button>
     </div>
   </div>
 
   <div class="sessions-table-container">
+    <div *ngIf="isLoading" class="loading-overlay">
+      <div class="spinner"></div>
+    </div>
+
     <table class="sessions-table">
       <thead>
         <tr>
           <th style="width: 40px;">
             <input type="checkbox" 
-                   [checked]="selectedSessionIds.size === sessions.length"
-                   (change)="toggleAllSessions($event)">
+                   [checked]="sessions.length > 0 && selectedSessionIds.size === sessions.length"
+                   (change)="toggleAllSessions($event)"
+                   [disabled]="sessions.length === 0 || isLoading">
           </th>
           <th>Пользователь</th>
           <th>Начало</th>
           <th>Конец</th>
           <th>Версия</th>
-          <th style="width: 40px;"></th>
         </tr>
       </thead>
       <tbody>
-        @for (session of sessions; track session.id) {
-          <tr [class.selected]="isSessionSelected(session)">
-            <td>
-              <input type="checkbox" 
-                     [checked]="isSessionSelected(session)"
-                     (change)="toggleSession(session.id)">
-            </td>
-            <td>
-              <div class="user-info">
-                <span class="user-avatar">{{ session.name.charAt(0).toUpperCase() }}</span>
-                <span>{{ session.name }}</span>
-              </div>
-            </td>
-            <td>{{ formatDate(session.startTime) }}</td>
-            <td>{{ formatDate(session.endTime) }}</td>
-            <td><span class="version-badge">{{ session.version }}</span></td>
-            <td>
-              <button class="btn-icon-small" (click)="toggleSession(session.id)">
-                <span>⋮</span>
-              </button>
-            </td>
-          </tr>
-        } @empty {
-          <tr>
-            <td colspan="6" class="empty-message">
-              <p>Сессии не найдены</p>
-            </td>
-          </tr>
-        }
+        <tr *ngFor="let session of sessions" 
+            [class.selected]="isSessionSelected(session)"
+            [class.loading]="isLoading">
+          <td>
+            <input type="checkbox" 
+                   [checked]="isSessionSelected(session)"
+                   (change)="toggleSession(session.id)"
+                   [disabled]="isLoading">
+          </td>
+          <td>
+            <div class="user-info">
+              <span class="user-avatar">{{ session.name.charAt(0).toUpperCase() }}</span>
+              <span>{{ session.name }}</span>
+            </div>
+          </td>
+          <td>{{ formatDate(session.startTime) }}</td>
+          <td>{{ formatDate(session.endTime) }}</td>
+          <td><span class="version-badge">{{ session.version }}</span></td>
+        </tr>
+        <tr *ngIf="sessions.length === 0 && !isLoading">
+          <td colspan="5" class="empty-message">
+            <p>Сессии не найдены</p>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
 
-  @if (showDeleteModal) {
-    <div class="modal-overlay" (click)="cancelDelete()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3>Подтверждение удаления</h3>
-          <button class="close-btn" (click)="cancelDelete()">×</button>
+  <div class="modal-overlay" *ngIf="showDeleteModal" (click)="cancelDelete()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Подтверждение удаления</h3>
+        <button class="close-btn" (click)="cancelDelete()">×</button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="deleteMode === 'date'" class="date-picker-group">
+          <label>Удалить сессии старше даты:</label>
+          <input type="datetime-local" 
+                 class="date-input"
+                 [(ngModel)]="cleanupDate">
         </div>
-        <div class="modal-body">
-          @if (deleteMode === 'date') {
-            <div class="date-picker-group">
-              <label>Удалить сессии старше даты:</label>
-              <input type="datetime-local" 
-                     class="date-input"
-                     [(ngModel)]="cleanupDate">
-            </div>
-          } @else if (deleteMode === 'selected') {
-            <p>Вы действительно хотите удалить выбранные сессии ({{ getSelectedCount() }})?</p>
-          }
-          <p class="warning-text">Это действие нельзя отменить!</p>
+        <div *ngIf="deleteMode === 'selected'">
+          <p>Вы действительно хотите удалить выбранные сессии ({{ getSelectedCount() }})?</p>
         </div>
-        <div class="modal-footer">
-          <button class="btn btn-outline" (click)="cancelDelete()">Отмена</button>
-          <button class="btn btn-danger" (click)="confirmDelete()">Удалить</button>
-        </div>
+        <p class="warning-text">Это действие нельзя отменить!</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" (click)="cancelDelete()">Отмена</button>
+        <button class="btn btn-danger" (click)="confirmDelete()">Удалить</button>
       </div>
     </div>
-  }
+  </div>
 </div>

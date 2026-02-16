@@ -1,23 +1,26 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { Component, Input, OnInit, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/device.service';
-import { SessionInfo, SortDirection, DeleteParameters } from '../../models/device.models';
+import { SessionInfo, SortDirection, DeleteParameters, SessionInfoPage } from '../../models/device.models';
+import { CeilPipe } from '../../pipes/ceil.pipe';
 
 @Component({
   selector: 'app-session-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe],
+  imports: [CommonModule, FormsModule, CeilPipe],
   templateUrl: './session-list.component.html',
   styleUrls: ['./session-list.component.less']
 })
 export class SessionListComponent implements OnInit {
   @Input() deviceId!: string;
   @Output() sessionsUpdated = new EventEmitter<void>();
+  @Output() refreshRequested = new EventEmitter<void>();
 
   sessions: SessionInfo[] = [];
   totalSessions = 0;
   selectedSessionIds = new Set<string>();
+  isLoading = false;
   
   filter = {
     limit: 15,
@@ -29,21 +32,57 @@ export class SessionListComponent implements OnInit {
   showDeleteModal = false;
   deleteMode: 'date' | 'selected' | null = null;
 
-  constructor(private api: ApiService) {}
+  constructor(
+    private api: ApiService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
     this.loadSessions();
   }
 
+  ngOnChanges() {
+    if (this.deviceId) {
+      this.filter.offset = 0;
+      this.loadSessions();
+    }
+  }
+
   loadSessions() {
+    if (!this.deviceId) return;
+
+    this.isLoading = true;
+    this.cdr.detectChanges();
+    
     this.api.getSessions(this.deviceId, this.filter.offset, this.filter.limit, this.filter.sortDirection)
       .subscribe({
-        next: (response) => {
-          this.sessions = response?.items || [];
-          this.totalSessions = response?.totalCount || 0;
+        next: (response: SessionInfoPage) => {
+          if (response) {
+            if (response.items && Array.isArray(response.items)) {
+              this.sessions = [...response.items];
+            }
+            
+            if (response.totalItems !== undefined) {
+              this.totalSessions = response.totalItems;
+            } else {
+              this.totalSessions = this.sessions.length;
+            }
+          }
+          this.isLoading = false;
+          this.cdr.detectChanges();
         },
-        error: (err) => console.error('Ошибка загрузки сессий', err)
+        error: (err) => {
+          console.error('Ошибка загрузки сессий', err);
+          this.sessions = [];
+          this.totalSessions = 0;
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
       });
+  }
+
+  refresh() {
+    this.loadSessions();
   }
 
   nextPage() {
@@ -111,10 +150,10 @@ export class SessionListComponent implements OnInit {
         this.cleanupDate = '';
         this.loadSessions();
         this.sessionsUpdated.emit();
-        this.showNotification('Сессии успешно удалены', 'success');
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        this.showNotification('Ошибка при удалении: ' + (err.error?.message || err.message), 'error');
+        alert('Ошибка при удалении: ' + (err.error?.message || err.message));
       }
     });
   }
@@ -122,10 +161,6 @@ export class SessionListComponent implements OnInit {
   cancelDelete() {
     this.showDeleteModal = false;
     this.deleteMode = null;
-  }
-
-  showNotification(message: string, type: 'success' | 'error') {
-    alert(message);
   }
 
   formatDate(dateString: string): string {
@@ -137,5 +172,19 @@ export class SessionListComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  getCurrentPage(): number {
+    return Math.floor(this.filter.offset / this.filter.limit) + 1;
+  }
+
+  getTotalPages(): number {
+    if (this.totalSessions === 0) return 1;
+    return Math.ceil(this.totalSessions / this.filter.limit);
+  }
+
+  getTotalPagesDisplay(): string {
+    const pages = this.getTotalPages();
+    return pages.toString();
   }
 }

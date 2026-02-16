@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./Backend/InfotecsBackend
+      dockerfile: Dockerfile
+    container_name: infotecs-backend
+    ports:
+      - "5000:8080"  
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=infotecsdb;Username=postgres;Password=postgres
+    depends_on:
+      - db
+    networks:
+      - infotecs-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./Frontend/device-monitoring-spa
+      dockerfile: dockerfile
+    container_name: infotecs-frontend
+    ports:
+      - "8087:80"  
+    environment:
+      - API_URL=http://localhost:8080/api/v1
+    depends_on:
+      - backend
+    networks:
+      - infotecs-network
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    container_name: infotecs-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=infotecsdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./Backend/InfotecsBackend/init.sql:/docker-entrypoint-initdb.d/init.sql 
+    networks:
+      - infotecs-network
+    restart: unless-stopped
+
+  adminer:
+    image: adminer:latest
+    container_name: infotecs-adminer
+    ports:
+      - "8082:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=db
+    depends_on:
+      - db
+    networks:
+      - infotecs-network
+    restart: unless-stopped
+
+networks:
+  infotecs-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local

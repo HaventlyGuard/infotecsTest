@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("InfotecsBackend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3af9e39e5f419615b37f6306b87710efa85e815e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4f01bdd8dc63ca32872e4ae11955281baa072d0a")]
 [assembly: System.Reflection.AssemblyProductAttribute("InfotecsBackend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("InfotecsBackend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

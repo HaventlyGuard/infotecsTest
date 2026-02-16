@@ -1,61 +1,85 @@
 <div class="container">
   <header class="header">
     <h1>Панель мониторинга Infotecs</h1>
-    <div class="stats">
-      Всего устройств: <strong>{{ devices.length }}</strong>
-      @if (devices.length > 0) {
-        <span class="badge">Показано: {{ devices.length }}</span>
-      }
+    <div class="header-actions">
+      <div class="stats">
+        Всего устройств: <strong>{{ totalDevices }}</strong>
+        <span *ngIf="devices.length > 0" class="badge">Показано: {{ devices.length }}</span>
+      </div>
+      <button class="btn-refresh" (click)="loadDevices()" title="Обновить список устройств">
+        <span class="refresh-icon">↻</span>
+        <span class="refresh-text">Обновить</span>
+      </button>
     </div>
   </header>
 
   <div class="dashboard-layout">
     <div class="devices-panel">
       <div class="panel-header">
-        <h2>Устройства</h2>
-        <div class="pagination-controls">
-          <button class="btn-icon" (click)="prevPage()" [disabled]="deviceFilter.offset === 0">
-            <span>←</span>
-          </button>
-          <span class="pagination-info">
-            Стр. {{ getCurrentPage() }} из {{ getTotalPages() }}
-          </span>
-          <button class="btn-icon" (click)="nextPage()" 
-                  [disabled]="(deviceFilter.offset + deviceFilter.limit) >= totalDevices">
-            <span>→</span>
-          </button>
+        <div class="panel-title">
+          <h2>Устройства</h2>
+          <span class="device-count" *ngIf="devices.length > 0">{{ devices.length }}</span>
+        </div>
+        <div class="panel-controls">
+          <div class="pagination-controls">
+            <button class="btn-icon" (click)="prevPage()" [disabled]="deviceFilter.offset === 0">
+              <span>←</span>
+            </button>
+            <span class="pagination-info">
+              {{ getCurrentPage() }}/{{ getTotalPages() }}
+            </span>
+            <button class="btn-icon" (click)="nextPage()" 
+                    [disabled]="(deviceFilter.offset + deviceFilter.limit) >= totalDevices">
+              <span>→</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      @if (devices.length > 0) {
-        <app-device-list
-          [devices]="devices"
-          [selectedDeviceId]="selectedDeviceId"
-          (deviceSelected)="onDeviceSelected($event)"
-          (devicesUpdated)="onDevicesUpdated()">
-        </app-device-list>
-      } @else {
+      <app-device-list
+        *ngIf="devices.length > 0; else emptyDevices"
+        [devices]="devices"
+        [selectedDeviceId]="selectedDeviceId"
+        (deviceSelected)="onDeviceSelected($event)"
+        (devicesUpdated)="onDevicesUpdated()">
+      </app-device-list>
+      
+      <ng-template #emptyDevices>
         <div class="empty-state">
           <div class="empty-icon">📱</div>
           <h3>Устройства не найдены</h3>
-          <p>Проверьте подключение к серверу</p>
+          <p *ngIf="errorMessage">Ошибка: {{ errorMessage }}</p>
+          <p *ngIf="!errorMessage">Проверьте подключение к серверу</p>
+          <button class="btn-retry" (click)="loadDevices()">Повторить</button>
         </div>
-      }
+      </ng-template>
     </div>
 
     <div class="sessions-panel">
-      @if (selectedDeviceId) {
-        <app-session-list
-          [deviceId]="selectedDeviceId"
-          (sessionsUpdated)="onDevicesUpdated()">
-        </app-session-list>
-      } @else {
+      <div class="panel-header" *ngIf="selectedDeviceId">
+        <div class="panel-title">
+          <h2>Сессии устройства</h2>
+          <span class="device-id-badge">{{ selectedDeviceId | slice:0:8 }}...</span>
+        </div>
+        <button class="btn-icon btn-refresh-small" (click)="refreshSessions()" title="Обновить сессии">
+          ↻
+        </button>
+      </div>
+
+      <app-session-list
+        *ngIf="selectedDeviceId; else emptySessions"
+        [deviceId]="selectedDeviceId"
+        (sessionsUpdated)="onDevicesUpdated()"
+        (refreshRequested)="refreshSessions()">
+      </app-session-list>
+      
+      <ng-template #emptySessions>
         <div class="empty-state">
           <div class="empty-icon">📊</div>
           <h3>Устройство не выбрано</h3>
           <p>Выберите устройство из списка слева</p>
         </div>
-      }
+      </ng-template>
     </div>
   </div>
 </div>

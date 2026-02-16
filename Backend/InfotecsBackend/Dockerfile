@@ -3,22 +3,23 @@ USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
+ENV NUGET_SIGNATURE_VERIFICATION=false
+
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-COPY ["InfotecsBackend/InfotecsBackend.csproj", "InfotecsBackend/"]
-RUN dotnet restore "InfotecsBackend/InfotecsBackend.csproj"
+ENV NUGET_SIGNATURE_VERIFICATION=false
+COPY *.csproj ./
+RUN dotnet restore
 
 COPY . .
-
-WORKDIR "/src/InfotecsBackend"
-RUN dotnet build "InfotecsBackend.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "InfotecsBackend.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

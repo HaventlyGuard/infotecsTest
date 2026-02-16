@@ -22,7 +22,8 @@ export interface DeviceInfo {
 // Страница для пагинации устройств
 export interface DeviceInfoPage {
   items?: DeviceInfo[] | null;
-  totalCount?: number;
+  totalItems?: number;  // Изменено с totalCount на totalItems
+  totalCount?: number;  // Оставляем для обратной совместимости
 }
 
 // Информация о Сессии
@@ -33,10 +34,12 @@ export interface SessionInfo {
   startTime: string;
   endTime: string;
   version: string;
+  isDeleted?: boolean; 
 }
 
 // Страница для пагинации сессий
 export interface SessionInfoPage {
   items?: SessionInfo[] | null;
-  totalCount?: number;
+  totalItems?: number;  // Изменено с totalCount на totalItems
+  totalCount?: number;  // Оставляем для обратной совместимости
 }

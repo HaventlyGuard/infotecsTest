@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/device.service';
 import { DeviceInfo, SortDirection, DeviceInfoPage } from '../../models/device.models';
-import { DeviceListComponent } from '../devise-list/device-list.component';
+import { DeviceListComponent } from '../device-list/device-list.component';
 import { SessionListComponent } from '../session-list/session-list.component';
 
 @Component({
@@ -24,56 +24,62 @@ export class DashboardComponent implements OnInit {
     sortDirection: SortDirection.Value1
   };
 
-  constructor(private api: ApiService) {
-    console.log('DashboardComponent initialized');
-  }
+  errorMessage: string | null = null;
+
+  constructor(
+    private api: ApiService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    console.log('DashboardComponent ngOnInit');
     this.loadDevices();
   }
 
   loadDevices() {
-    console.log('Loading devices with filter:', this.deviceFilter);
+    this.errorMessage = null;
     
     this.api.getDevices(this.deviceFilter.offset, this.deviceFilter.limit, this.deviceFilter.sortDirection)
       .subscribe({
         next: (response: DeviceInfoPage) => {
-          console.log('Devices response:', response);
-          
-          // Проверяем структуру ответа
-          if (response && response.items) {
-            this.devices = response.items || [];
-            this.totalDevices = response.totalCount || 0;
-          } else if (Array.isArray(response)) {
-            // Если API возвращает просто массив
-            this.devices = response;
-            this.totalDevices = response.length;
+          if (response) {
+            if (response.items && Array.isArray(response.items)) {
+              this.devices = [...response.items];
+            }
+            
+            if (response.totalItems !== undefined) {
+              this.totalDevices = response.totalItems;
+            } else {
+              this.totalDevices = this.devices.length;
+            }
           }
-          
-          console.log('Processed devices:', this.devices);
-          console.log('Total devices:', this.totalDevices);
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('Ошибка загрузки устройств', err);
+          this.errorMessage = err.message || 'Unknown error';
           this.devices = [];
           this.totalDevices = 0;
+          this.cdr.detectChanges();
         }
       });
   }
 
   onDeviceSelected(deviceId: string) {
-    console.log('Device selected:', deviceId);
     this.selectedDeviceId = deviceId;
+    this.cdr.detectChanges();
   }
 
   onDevicesUpdated() {
-    console.log('Devices updated, reloading...');
     this.loadDevices();
   }
 
+  refreshSessions() {
+    if (this.selectedDeviceId) {
+      this.onDeviceSelected(this.selectedDeviceId);
+    }
+  }
+
   nextPage() {
-    console.log('Next page, current offset:', this.deviceFilter.offset);
     this.deviceFilter.offset += this.deviceFilter.limit;
     this.loadDevices();
   }
