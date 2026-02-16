@@ -5,8 +5,9 @@
       <span class="device-id-badge">{{ deviceId | slice:0:8 }}...</span>
     </div>
     <div class="header-right">
-      <button class="btn-refresh-small" (click)="refresh()" [disabled]="isLoading" title="Обновить">
+      <button class="btn-refresh" (click)="refresh()" [disabled]="isLoading" title="Обновить список сессий">
         <span class="refresh-icon" [class.spinning]="isLoading">↻</span>
+        <span class="refresh-text">Обновить</span>
       </button>
       <div class="pagination">
         <button class="btn-icon" (click)="prevPage()" [disabled]="filter.offset === 0 || isLoading">

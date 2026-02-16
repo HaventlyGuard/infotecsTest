@@ -6,10 +6,7 @@
         Всего устройств: <strong>{{ totalDevices }}</strong>
         <span *ngIf="devices.length > 0" class="badge">Показано: {{ devices.length }}</span>
       </div>
-      <button class="btn-refresh" (click)="loadDevices()" title="Обновить список устройств">
-        <span class="refresh-icon">↻</span>
-        <span class="refresh-text">Обновить</span>
-      </button>
+
     </div>
   </header>
 
