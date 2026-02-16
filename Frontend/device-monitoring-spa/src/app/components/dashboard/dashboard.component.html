@@ -1,0 +1,45 @@
+<div class="container">
+  <header class="header">
+    <h1>Панель мониторинга Infotecs</h1>
+    <div class="stats">Всего устройств: {{ totalDevices }}</div>
+  </header>
+
+  <div class="dashboard-layout">
+    <div class="devices-panel">
+      <div class="panel-header">
+        <h2>Устройства</h2>
+        <div class="pagination-controls">
+          <button class="btn-icon" (click)="prevPage()" [disabled]="deviceFilter.offset === 0">
+            <span>←</span>
+          </button>
+          <span class="pagination-info">Стр. {{ (deviceFilter.offset / deviceFilter.limit) + 1 }}</span>
+          <button class="btn-icon" (click)="nextPage()">
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+
+      <app-device-list
+        [devices]="devices"
+        [selectedDeviceId]="selectedDeviceId"
+        (deviceSelected)="onDeviceSelected($event)"
+        (devicesUpdated)="onDevicesUpdated()">
+      </app-device-list>
+    </div>
+
+    <div class="sessions-panel">
+      @if (selectedDeviceId) {
+        <app-session-list
+          [deviceId]="selectedDeviceId"
+          (sessionsUpdated)="onDevicesUpdated()">
+        </app-session-list>
+      } @else {
+        <div class="empty-state">
+          <div class="empty-icon">📱</div>
+          <h3>Устройство не выбрано</h3>
+          <p>Выберите устройство из списка слева, чтобы просмотреть и управлять его сессиями</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>

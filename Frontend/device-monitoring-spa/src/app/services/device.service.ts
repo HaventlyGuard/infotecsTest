@@ -1,41 +1,36 @@
-// src/app/services/device.service.ts
-import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { toSignal, toObservable } from '@angular/core/rxjs-interop';
-import { DeviceInfo, DeviceSession } from '../models/device.models';
-import { switchMap, map } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { DeleteParameters, DeviceInfoPage, SessionInfoPage, SortDirection } from '../models/device.models';
 
 @Injectable({
   providedIn: 'root'
 })
-export class DeviceService {
-  private http = inject(HttpClient);
+export class ApiService {
   private apiUrl = 'http://localhost:5000/api/v1';
-
-  selectedDeviceId = signal<string | null>(null);
-
-  getDevices(): Observable<DeviceInfo[]> {
-    console.log('Запрос к:', `${this.apiUrl}/devices`);
-    return this.http.get<DeviceInfo[]>(`${this.apiUrl}/devices`);
+  
+  constructor(private http: HttpClient) { }
+  
+  getDevices(offset: number, limit: number, sortDirection: SortDirection): Observable<DeviceInfoPage> {
+    const params = new HttpParams()
+      .set('limit', limit)
+      .set('offset', offset)
+      .set('sortDirection', sortDirection);
+    return this.http.get<DeviceInfoPage>(`${this.apiUrl}/devices`, { params });
   }
+  
+  getSessions(deviceId: string, offset: number, limit: number, sortDirection: SortDirection): Observable<SessionInfoPage> {
+    const params = new HttpParams()
+      .set('offset', offset)
+      .set('limit', limit)
+      .set('sortDirection', sortDirection);
 
-  getDeviceSessions(deviceId: string): Observable<DeviceSession[]> {
-    console.log('Запрос к:', `${this.apiUrl}/devices/${deviceId}/sessions`);
-    return this.http.get<DeviceSession[]>(`${this.apiUrl}/devices/${deviceId}/sessions`);
+    return this.http.get<SessionInfoPage>(`${this.apiUrl}/sessions/${deviceId}`, { params });
   }
-
-  deleteOldSessions(deviceId: string, beforeDate: string): Observable<any> {
-     console.log('Удаление:', `${this.apiUrl}/devices/${deviceId}/sessions?before=${beforeDate}`);
-    return this.http.delete(`${this.apiUrl}/devices/${deviceId}/sessions`, {
-      params: { before: beforeDate }
+  
+  deleteSessions(deleteParams: DeleteParameters): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/sessions`, {
+      body: deleteParams
     });
   }
-
-  readonly sessions$ = toObservable(this.selectedDeviceId).pipe(
-    switchMap(deviceId => {
-      if (!deviceId) return of([]);
-      return this.getDeviceSessions(deviceId);
-    })
-  );
 }

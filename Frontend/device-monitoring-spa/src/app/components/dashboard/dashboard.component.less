@@ -1,0 +1,140 @@
+@primary-color: #4361ee;
+@secondary-color: #3f37c9;
+@success-color: #4cc9f0;
+@danger-color: #f72585;
+@warning-color: #f8961e;
+@light-bg: #f8f9fa;
+@border-color: #dee2e6;
+@text-primary: #212529;
+@text-secondary: #6c757d;
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+}
+
+.header {
+  background: white;
+  border-radius: 16px;
+  padding: 24px 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h1 {
+    margin: 0;
+    color: @primary-color;
+    font-weight: 600;
+    font-size: 1.8rem;
+  }
+
+  .stats {
+    background: @light-bg;
+    padding: 8px 16px;
+    border-radius: 30px;
+    color: @primary-color;
+    font-weight: 500;
+    border: 1px solid @border-color;
+  }
+}
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+  height: calc(100vh - 140px);
+}
+
+.devices-panel, .sessions-panel {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-header {
+  padding: 20px;
+  border-bottom: 1px solid @border-color;
+  background: @light-bg;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: @text-primary;
+    font-weight: 600;
+  }
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  border: 1px solid @border-color;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: @primary-color;
+    border-color: @primary-color;
+    color: white;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.pagination-info {
+  color: @text-secondary;
+  font-size: 0.9rem;
+  min-width: 60px;
+  text-align: center;
+}
+
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+  color: @text-secondary;
+
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    color: @text-primary;
+  }
+
+  p {
+    margin: 0;
+    max-width: 300px;
+  }
+}
